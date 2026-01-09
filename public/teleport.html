@@ -1,0 +1,63 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Téléportation</title>
+  <style>
+    html,body{margin:0;padding:0;font-family:system-ui, sans-serif}
+    .card{background:#ffffffcc; backdrop-filter: blur(6px);
+          border:1px solid #ddd; border-radius:12px; padding:12px}
+    .title{font-weight:600; font-size:14px; margin-bottom:8px}
+    .row{display:flex; gap:8px; align-items:center}
+    select,button{font-size:14px; padding:8px 10px; border-radius:10px; border:1px solid #ccc}
+    button{cursor:pointer}
+    .hint{margin-top:8px; font-size:12px; opacity:.8}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="title">Choisir une destination</div>
+    <div class="row">
+      <select id="zone"></select>
+      <button id="go">Téléporter</button>
+    </div>
+    <div class="hint">Clique à nouveau sur le bouton « Téléportation » pour fermer ce menu.</div>
+  </div>
+
+  <script type="module">
+    const select = document.getElementById('zone');
+    const btn = document.getElementById('go');
+
+    let ENTRIES = [];
+    let MAP_URL = '';
+
+    window.addEventListener('message', (e) => {
+      const data = e.data;
+      if (data?.type === 'tp-init') {
+        ENTRIES = Array.isArray(data.entries) ? data.entries : [];
+        MAP_URL = data.mapUrl || '';
+        fillOptions();
+      }
+    });
+
+    function fillOptions() {
+      select.innerHTML = '';
+      ENTRIES.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;          // ex: '#TPAINFO'
+        opt.textContent = e.label; // ex: 'Informatique'
+        select.appendChild(opt);
+      });
+    }
+
+    function teleport() {
+      const entry = select.value?.trim();
+      if (!entry) return;
+      parent.postMessage({ type: 'tp-go', entry }, '*');
+    }
+
+    btn.addEventListener('click', teleport);
+    select.addEventListener('keydown', (e) => { if (e.key === 'Enter') teleport(); });
+  </script>
+</body>
+</html>
