@@ -128,6 +128,8 @@ function openInitForm(){
     L.log("Form already done");
     return;
   }
+  
+  L.log("Form opened");
 
   /// Init the variables form variables
   WA.player.state.saveVariable("ynov_adventure_form_done", false);
@@ -146,6 +148,9 @@ function openInitForm(){
     allowFullScreen: true,
     // @ts-ignore: UI API is not typed
     closable: false,
+  }, ()=> {
+    L.log("Form closed");
+    WA.controls.restorePlayerControls();
   });
 }
 
